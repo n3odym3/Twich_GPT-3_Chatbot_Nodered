@@ -1,0 +1,131 @@
+[
+    {
+        "id": "c43d49ad11e3fbd6",
+        "type": "group",
+        "z": "1b0be6084396e80e",
+        "name": "GPT-3 Twitch chatbot",
+        "style": {
+            "stroke": "#000000",
+            "fill": "#b797cf",
+            "fill-opacity": "0.5",
+            "label": true,
+            "color": "#000000"
+        },
+        "nodes": [
+            "3ffcb0dbc1ac243f",
+            "c6ef86073ed5b122",
+            "6a58c0727bae0130",
+            "6d7a0122a24493bc",
+            "b9b1e9318e2a3373"
+        ],
+        "x": 54,
+        "y": 59,
+        "w": 752,
+        "h": 82
+    },
+    {
+        "id": "3ffcb0dbc1ac243f",
+        "type": "function",
+        "z": "1b0be6084396e80e",
+        "g": "c43d49ad11e3fbd6",
+        "name": "!GPT",
+        "func": "msg.payload.cmd = msg.payload.message.toLowerCase().split(\" \");\n\nif(msg.payload.cmd[0]==\"!gpt\"){\n    return msg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 100,
+        "wires": [
+            [
+                "6a58c0727bae0130"
+            ]
+        ]
+    },
+    {
+        "id": "c6ef86073ed5b122",
+        "type": "function",
+        "z": "1b0be6084396e80e",
+        "g": "c43d49ad11e3fbd6",
+        "name": "GPT API",
+        "func": "const configuration = new openailib.Configuration({\n    apiKey: \"PUT YOUR API KEY HERE !\",\n});\n\nconst openai = new openailib.OpenAIApi(configuration);\nconst response = await openai.createCompletion({\n    model: \"text-davinci-003\",\n    prompt: msg.payload.request,\n    max_tokens: 256,\n});\n\nmsg.payload.message = response.data.choices[0].text.trim();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "openailib",
+                "module": "openai"
+            }
+        ],
+        "x": 590,
+        "y": 100,
+        "wires": [
+            [
+                "b9b1e9318e2a3373"
+            ]
+        ]
+    },
+    {
+        "id": "6a58c0727bae0130",
+        "type": "function",
+        "z": "1b0be6084396e80e",
+        "g": "c43d49ad11e3fbd6",
+        "name": "Format request",
+        "func": "msg.payload.request = \"\";\n//msg.payload.request = \"you can modify/add text to the request here\"\nmsg.payload.cmd.shift()\nfor (let word of msg.payload.cmd) {\n    msg.payload.request += word + \" \";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 100,
+        "wires": [
+            [
+                "c6ef86073ed5b122"
+            ]
+        ]
+    },
+    {
+        "id": "6d7a0122a24493bc",
+        "type": "tmi-event-message",
+        "z": "1b0be6084396e80e",
+        "g": "c43d49ad11e3fbd6",
+        "config": "",
+        "name": "TMI input",
+        "channels_filter": "ioodyme",
+        "users_filter": "",
+        "action": false,
+        "chat": true,
+        "whisper": false,
+        "regular": true,
+        "mod": true,
+        "subscriber": true,
+        "broadcaster": true,
+        "message_regexp": "",
+        "message_flags": "",
+        "x": 140,
+        "y": 100,
+        "wires": [
+            [
+                "3ffcb0dbc1ac243f"
+            ]
+        ]
+    },
+    {
+        "id": "b9b1e9318e2a3373",
+        "type": "tmi-command-action",
+        "z": "1b0be6084396e80e",
+        "g": "c43d49ad11e3fbd6",
+        "config": "",
+        "name": "",
+        "x": 730,
+        "y": 100,
+        "wires": [
+            [],
+            []
+        ]
+    }
+]
